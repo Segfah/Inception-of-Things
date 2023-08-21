@@ -1,72 +1,60 @@
-NUM_NODES = 2
-NUM_CONTROLLER_NODE = 1
 IP_NTW = "192.168.56."
-CONTROLLER_IP_START = 110
-NODE_IP_START = CONTROLLER_IP_START + NUM_CONTROLLER_NODE
+SERVER_IP = 110
+WORKER_IP = 111
+SERVER_NAME = "lmalki-hS"
+WORKER_NAME = "lmalki-hSW"
+
+$commonscript = <<-SCRIPT
+apt-get update
+echo "#{IP_NTW}#{SERVER_IP} #{SERVER_NAME}" >> /etc/hosts
+echo "#{IP_NTW}#{WORKER_IP} #{WORKER_NAME}" >> /etc/hosts
+mkdir -p /home/vagrant/.ssh
+yes | ssh-keygen -t rsa -b 2048 -f /home/vagrant/.ssh/id_rsa -q -N ""
+chown -R vagrant:vagrant /home/vagrant/.ssh
+chmod 700 /home/vagrant/.ssh
+chmod 600 /home/vagrant/.ssh/authorized_keys
+systemctl restart sshd
+SCRIPT
+
+$serverscript = <<-SCRIPT
+curl -sfL https://get.k3s.io | sh -
+cp /var/lib/rancher/k3s/server/node-token /vagrant/node-token
+SCRIPT
+
+
+$nodescript = <<-SCRIPT
+cp /vagrant/node-token /home/vagrant/node-token
+curl -sfL https://get.k3s.io | K3S_URL=https://#{IP_NTW}#{SERVER_IP}:6443 K3S_TOKEN_FILE="/home/vagrant/node-token" sh -
+SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/focal64"
+config.vm.box = "ubuntu/focal64"
 
-  # Controller Nodes
-  (1..NUM_CONTROLLER_NODE).each do |i|
-    config.vm.define "lmalki-hS" do |node|
-      node.vm.provider "virtualbox" do |vb|
-        vb.name = "lmalki-hS"
-        vb.memory = 2048
-        vb.cpus = 2
-      end
-
-      node.vm.hostname = "lmalki-hS"
-      node.vm.network "private_network", ip: "#{IP_NTW}#{CONTROLLER_IP_START + i}"
-      node.vm.network "forwarded_port", guest: 22, host: "#{2710 + i}"
-      node.vm.provision "shell", inline: <<-SHELL
-
-        # Software update
-        apt-get update
-
-        # Generate SSH public key and copy it on host machine
-        mkdir -p /home/vagrant/.ssh
-        yes | ssh-keygen -t rsa -b 2048 -f /home/vagrant/.ssh/id_rsa -q -N ""
-        chown -R vagrant:vagrant /home/vagrant/.ssh
-        chmod 700 /home/vagrant/.ssh
-        chmod 600 /home/vagrant/.ssh/authorized_keys
-        cat /home/vagrant/.ssh/id_rsa.pub > /vagrant/lmalki-h#{i}_pubkey
-        systemctl restart sshd
-
-        # Install k3s on the controller node
-        curl -sfL https://get.k3s.io | sh -
-      SHELL
+# Server Node
+  config.vm.define "#{SERVER_NAME}" do |node|
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "#{SERVER_NAME}"
+      vb.memory = 1024
+      vb.cpus = 1
     end
+    node.vm.hostname = "#{SERVER_NAME}"
+    node.vm.network "private_network", bridge: "eth1", ip: "#{IP_NTW}#{SERVER_IP}"
+    node.vm.network "forwarded_port", guest: 22, host: 2710
+    node.vm.provision "shell", inline: $commonscript
+    node.vm.provision "shell", inline: $serverscript
   end
 
-  # Worker Nodes
-  (1..NUM_NODES).each do |i|
-    config.vm.define "lmalki-hSW" do |node|
-      node.vm.provider "virtualbox" do |vb|
-        vb.name = "lmalki-hSW"
-        vb.memory = 2048
-        vb.cpus = 2
-      end
-
-      node.vm.hostname = "lmalki-hSW"
-      node.vm.network "private_network", ip: "#{IP_NTW}#{NODE_IP_START + i}"
-      node.vm.network "forwarded_port", guest: 22, host: "#{2720 + i}"
-      node.vm.provision "shell", inline: <<-SHELL
-
-        # Software update
-        apt-get update
-
-        # Adds lmalki-hS public key to worker's authorized_keys
-        mkdir -p /home/vagrant/.ssh
-        cat /vagrant/lmalki-hS_pubkey >> /home/vagrant/.ssh/authorized_keys
-        chown -R vagrant:vagrant /home/vagrant/.ssh
-        chmod 700 /home/vagrant/.ssh
-        chmod 600 /home/vagrant/.ssh/authorized_keys
-        systemctl restart sshd
-
-        # Install k3s on the agent node
-        curl -sfL https://get.k3s.io | K3S_URL=https://lmalki-hS:6443 K3S_TOKEN=$(cat /var/lib/rancher/k3s/server/node-token) sh -
-      SHELL
+# Worker Nodes
+  config.vm.define "#{WORKER_NAME}" do |node|
+    node.vm.provider "virtualbox" do |vb|
+      vb.name = "#{WORKER_NAME}"
+      vb.memory = 1024
+      vb.cpus = 1
     end
+    node.vm.hostname = "#{WORKER_NAME}"
+    node.vm.network "private_network", bridge: "eth1", ip: "#{IP_NTW}#{WORKER_IP}"
+    node.vm.network "forwarded_port", guest: 22, host: 2720
+    node.vm.provision "shell", inline: $commonscript
+    node.vm.provision "shell", inline: $nodescript
   end
 end
