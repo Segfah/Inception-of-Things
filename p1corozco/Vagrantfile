@@ -31,7 +31,6 @@ Vagrant.configure("2") do |config|
       sudo ip link set eth1 up
 
       # Instalar K3s en modo controlador
-      alias k="sudo kubectl"
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--cluster-init --node-ip #{SERVER_IP}" sh -
       sudo cp /var/lib/rancher/k3s/server/node-token /vagrant
     SHELL
@@ -49,7 +48,6 @@ Vagrant.configure("2") do |config|
       sudo ip addr add 192.168.56.111/24 dev eth1
       sudo ip link set eth1 up
       # Imprimir el contenido del archivo de token
-      cat #{TOKEN_FILE}
       # https://blog.programster.org/install-k3s-agent-on-ubuntu-20-04
       curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://#{SERVER_IP}:6443 --token-file #{TOKEN_FILE} --node-ip=#{WORKER_IP}" sh -s -
     SHELL
