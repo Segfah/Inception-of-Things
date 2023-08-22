@@ -1,7 +1,9 @@
-.PHONY: up status clean fclean ssh
+.PHONY: up re status clean fclean ssh reload
 
 up:
 	@vagrant up
+
+re: clean up
 
 status:
 	@vagrant global-status
@@ -17,4 +19,11 @@ ssh:
 		echo "Usage: make ssh VM=<vm_name>"; \
 	else \
 		vagrant ssh $(VM); \
+	fi
+
+reload:
+	@if [ "$(RL)" = "" ]; then \
+		echo "Usage: make reload RL=<vm_name>"; \
+	else \
+		vagrant reload $(RL); \
 	fi
