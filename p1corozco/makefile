@@ -9,6 +9,7 @@ status:
 	@vagrant global-status
 
 clean:
+	@rm -rf node-token
 	@vagrant destroy -f
 
 fclean: clean

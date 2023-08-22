@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/focal64"
   config.vm.provider "virtualbox" do |vb|
     vb.memory = 2048
-    vb.cpus = 2
+    vb.cpus = 3
   end
 
   def common_provision(control)
@@ -41,15 +41,17 @@ Vagrant.configure("2") do |config|
     control.vm.hostname = "#{WORKER_NAME}"
     control.vm.network "private_network", ip: "#{WORKER_IP}"
     common_provision(control)
-
+    
     control.vm.provision "shell", inline: <<-SHELL
       # Provisión específica para corozcoSW
       # Agregar tus comandos personalizados aquí
       sudo ip link add eth1 type dummy
       sudo ip addr add 192.168.56.111/24 dev eth1
       sudo ip link set eth1 up
+      # Imprimir el contenido del archivo de token
+      cat #{TOKEN_FILE}
       # https://blog.programster.org/install-k3s-agent-on-ubuntu-20-04
-      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://#{SERVER_IP}:6443 --token-file #{TOKEN_FILE} --node-ip=#{SERVER_IP}" sh -s -
+      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://#{SERVER_IP}:6443 --token-file #{TOKEN_FILE} --node-ip=#{WORKER_IP}" sh -s -
     SHELL
   end
 end
