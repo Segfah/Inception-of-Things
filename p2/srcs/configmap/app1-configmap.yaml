@@ -1,0 +1,11 @@
+# https://k8s.camp/getting-started/4/
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app1-configmap
+  namespace: default
+data:
+    index.html: |
+        <html><head><title>app1</title></head><body>app1</body></html>
+---

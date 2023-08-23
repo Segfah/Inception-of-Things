@@ -1,0 +1,32 @@
+SERVER_IP = "192.168.56.110"
+SERVER_NAME = "corozcoS"
+PATH_YAML = "/vagrant/srcs/app/"
+PATH_CONFIGMAP_YAML = "/vagrant/srcs/configmap/"
+PATH_INGRESS = "/vagrant/srcs/ingress/"
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/focal64"
+
+  config.vm.define "#{SERVER_NAME}" do |control|
+    control.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 3
+    end
+    control.vm.hostname = "#{SERVER_NAME}"
+    control.vm.network "private_network", ip: "#{SERVER_IP}"
+    control.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get update
+      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --cluster-init --node-ip #{SERVER_IP}" sh -
+
+      sudo kubectl apply -f #{PATH_YAML}app1.yaml
+      sudo kubectl apply -f #{PATH_YAML}app2.yaml
+      sudo kubectl apply -f #{PATH_YAML}app3.yaml
+      sudo kubectl apply -f #{PATH_CONFIGMAP_YAML}app1-configmap.yaml
+      sudo kubectl apply -f #{PATH_CONFIGMAP_YAML}app2-configmap.yaml
+      sudo kubectl apply -f #{PATH_CONFIGMAP_YAML}app3-configmap.yaml
+      sudo kubectl apply -f #{PATH_INGRESS}ingress.yaml
+
+    SHELL
+  end
+
+end
