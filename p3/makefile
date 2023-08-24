@@ -1,7 +1,6 @@
-.PHONY: up re status clean fclean ssh reload
+.PHONY: up re install clean fclean
 
 up:
-	@vagrant up
 
 re: clean up
 
@@ -11,18 +10,7 @@ install:
 	@sh scripts/k3d_install.sh
 	@sh scripts/kubectl_install.sh
 
-status:
-	@vagrant global-status
-
 clean:
-	@rm -rf node-token
-	@vagrant destroy -f
-
+	
 fclean: clean
-	@vagrant global-status --prune
 
-ssh:
-	@vagrant ssh
-
-reload:
-	@vagrant reload 
