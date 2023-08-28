@@ -9,6 +9,8 @@ $serverscript = <<-SCRIPT
 apt-get update
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--cluster-init --node-ip #{SERVER_IP}" sh -
 kubectl apply -f #{PATH_YAML}
+kubectl apply -f #{PATH_CONFIGMAP_YAML}
+kubectl apply -f #{PATH_INGRESS}
 SCRIPT
 
 Vagrant.configure("2") do |config|
