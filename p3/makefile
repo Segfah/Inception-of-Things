@@ -1,6 +1,8 @@
 .PHONY: up re install clean fclean
 
 up:
+	@chmod +x scripts/setup.sh
+	@sh scripts/setup.sh
 
 re: clean up
 
