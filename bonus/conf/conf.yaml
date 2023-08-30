@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+    name: bonus
+    namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://gitlab.com/Segfah/corozco-bonus.git'
+    path: .
+    targetRevision: HEAD
+    directory:
+      jsonnet:
+        tlas:
+          - name: ''
+            value: ''
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: gitlab
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+      - PruneLast=true
