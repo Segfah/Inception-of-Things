@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Vérifier si Docker est déjà installé
-if command -v docker &>/dev/null; then
+if [ -x "$(command -v docker)" ]; then
 	echo "Docker est déjà installé. Version : $(docker --version)"
 else
 	echo "Installation de Docker..."
@@ -14,6 +14,7 @@ else
 	sudo apt install -y docker-ce
 	sudo systemctl start docker
 	sudo systemctl enable docker
-	sudo usermod -aG docker $USER
+	#sudo usermod -aG docker $USER
+	newgrp docker
 	echo "Docker a été installé avec succès.... c'est mieux si tu demarres ton ordi"
 fi
