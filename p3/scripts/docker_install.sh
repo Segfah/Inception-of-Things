@@ -14,7 +14,7 @@ else
 	sudo apt install -y docker-ce
 	sudo systemctl start docker
 	sudo systemctl enable docker
-	#sudo usermod -aG docker $USER
-	newgrp docker
+	sudo usermod -aG docker $USER
 	echo "Docker a été installé avec succès.... c'est mieux si tu demarres ton ordi"
+	newgrp docker
 fi
