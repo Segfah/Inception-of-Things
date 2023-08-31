@@ -57,3 +57,4 @@ spec:
             name: gitlab
             port:
               number: 80
+
