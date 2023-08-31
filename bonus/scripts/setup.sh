@@ -8,7 +8,7 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 # para esperar a que los pods de argocd esten preparados. 
 kubectl wait -n argocd --for=condition=Ready pods --all --timeout=-1s
 
-kubectl apply -n argocd -f ./conf/conf.yaml
+#kubectl apply -n argocd -f ./conf/conf.yaml
 
 argocd admin initial-password -n argocd
 
