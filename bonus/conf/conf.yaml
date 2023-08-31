@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://gitlab.com/Segfah/corozco-bonus.git'
+    repoURL: 'http://172.18.0.3/root/awesome_louisa.git'
     path: .
     targetRevision: HEAD
     directory:
