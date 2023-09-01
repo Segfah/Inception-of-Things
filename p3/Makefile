@@ -1,4 +1,4 @@
-.PHONY: up re install clean fclean
+.PHONY: up re install clean argocd
 
 up:
 	@chmod +x scripts/setup.sh
@@ -17,8 +17,9 @@ install:
 	@sh scripts/argocd_install.sh
 
 clean:
-	@chmod +x scripts/cleanup.sh
-	@sh scripts/cleanup.sh
+	@kubectl delete ns argocd
+	@kubectl delete ns dev
 	
-fclean: clean
-
+argocd:
+	kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+	kubectl port-forward svc/argocd-server -n argocd 8080:443

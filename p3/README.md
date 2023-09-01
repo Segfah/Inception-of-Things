@@ -1,4 +1,0 @@
-## install envirenement
-```
-make install
-```
