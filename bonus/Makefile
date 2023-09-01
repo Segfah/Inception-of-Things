@@ -1,4 +1,4 @@
-.PHONY: up re install clean fclean
+.PHONY: up re install clean argocd gitlab
 
 up:
 	@chmod +x scripts/setup.sh
@@ -17,8 +17,14 @@ install:
 	@sh scripts/argocd_install.sh
 
 clean:
-	@chmod +x scripts/cleanup.sh
-	@sh scripts/cleanup.sh
-	
-fclean: clean
+	@kubectl delete ns argocd
+	@kubectl delete ns gitlab
+
+argocd:
+	@kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+	@echo "\n"
+	@kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+gitlab:
+	@kubectl -n gitlab exec -it $(shell kubectl -n gitlab get pod -l app=gitlab -o jsonpath='{.items[0].metadata.name}') -- cat /etc/gitlab/initial_root_password
 

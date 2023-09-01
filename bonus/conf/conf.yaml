@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'http://172.18.0.3/root/awesome_louisa.git'
+    repoURL: 'http://172.18.0.2/root/awesome_louisa.git'
     path: .
     targetRevision: HEAD
     directory:
