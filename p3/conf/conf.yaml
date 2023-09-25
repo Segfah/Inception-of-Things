@@ -8,8 +8,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/Segfah/corozco-test-argocd'
-    path: .
+    repoURL: 'https://github.com/Segfah/Inception-of-Things'
+    path: ./p3/corozco-test-argocd/app.yaml
     targetRevision: HEAD
   destination:
     server: 'https://kubernetes.default.svc'
