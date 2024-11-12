@@ -7,8 +7,9 @@ more.
 
 1. [Prerequisites](#prerequisites)
 2. [Part 1: Automate a simple k3s cluster with Vagrant](#part-1-automate-a-simple-k3s-cluster-with-vagrant)
-3. [Part 2](#part-2)
-4. [Part 3](#part-3)
+3. [Part 2: K3s and Three Simple Applications](#part-2-k3s-and-three-simple-applications)
+4. [Part 3: K3d and Argo CD](#part-3-k3d-and-argo-cd)
+5. [Bonus: Integrating GitLab](#bonus-integrating-gitlab)
 
 ## Prerequisites
 
@@ -87,10 +88,67 @@ SCRIPT
 # We run this script on the node server
 control.vm.provision "shell", inline: $nodescript
 ```
-## Part 2: 
+## Part 2: K3s and Three Simple Applications 
 
-## Part 3: 
-- create VM
-- install docker, k3d, kubectl etc
-- 
-K3d deploys Docker-based k3s Kubernetes clusters.
+We set up a single virtual machine with K3s in server mode and deploy three web applications.
+
+### Configuration
+
+A single virtual.
+
+K3s is installed in server mode.
+
+Three web applications are deployed that run in your K3s instance.
+
+The applications should be accessible via specific hostnames configured to respond to requests sent to IP address 192.168.56.110.
+
+### Applications
+
+- app1: Accessible when using HOST app1.com
+- app2: Accessible when using HOST app2.com (with three replicas)
+- app3: Selected by default for any other HOST.
+
+### Ingress Configuration
+
+An Ingress resource is configured to manage routing based on the hostname of incoming requests.
+
+## Part 3: K3d and Argo CD
+
+Setting up K3d and implementing a continuous integration workflow using Argo CD.
+
+### Configuration Steps
+
+- Install K3d (which requires Docker) on a virtual machine without using Vagrant.
+- Create two namespaces:
+   - One dedicated to Argo CD.
+   - Another named dev for containing an application.
+- Configure Argo CD to automatically deploy an application from a public GitHub repository.
+
+### Application Deployment
+
+- The application should have two different versions (v1 and v2).
+- The application is deployed in the dev namespace.
+- Demonstrate updating the application by changing its version in the GitHub repository.
+
+### Argo CD Integration
+
+- Set up Argo CD to monitor your GitHub repository and apply changes automatically.
+- Show how Argo CD synchronizes and updates the application when changes are made in GitHub.
+
+## Bonus: Integrating GitLab
+
+The bonus section aims to enhance the project by adding GitLab to your setup from Part 3.
+
+### Requirements:
+
+- Install GitLab locally within your Kubernetes cluster.
+
+- Ensure that all functionalities implemented in Part 3 work seamlessly with your local GitLab instance.
+
+### Steps:
+
+- Use Helm or any other tools necessary for installing GitLab.
+
+- Configure GitLab to integrate with your Kubernetes cluster properly.
+
+- Ensure that CI/CD pipelines can trigger deployments based on changes made in your GitLab repositories.
